@@ -8,7 +8,8 @@ jobs:
   comment:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@0.8.0
+      - name: issueにコメントを追加
+        uses: actions/github-script@0.8.0
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -18,8 +19,14 @@ jobs:
               repo: context.repo.repo,
               body: "🎉 GitHubスクリプトのテストです！"
             })
+      - name: issueをプロジェクトボードに追加
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
             github.projects.createCard({
-              column_id: 14120676,
-              context_id: context.payload.issue.id,
-              context_type: "Issue"
-              })
+            column_id: 14120676,
+            content_id: context.payload.issue.id,
+            content_type: "Issue"
+            })
