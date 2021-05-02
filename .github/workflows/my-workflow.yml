@@ -18,3 +18,8 @@ jobs:
               repo: context.repo.repo,
               body: "🎉 GitHubスクリプトのテストです！"
             })
+            github.projects.createCard({
+              column_id: 14120676,
+              context_id: context.payload.issue.id,
+              context_type: "Issue"
+              })
