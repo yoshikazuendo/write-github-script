@@ -8,18 +8,31 @@ jobs:
   comment:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@0.8.0
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        
+      - name: issueにコメントを追加
+        uses: actions/github-script@0.8.0
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            const fs = require('fs')
+            const issueBody = fs.readFileSync(".github/ISSUE_RESPONSES/comment.md", "utf8")
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "🎉 GitHubスクリプトのテストです！"
+              body: issueBody
             })
+            
+      - name: issueをプロジェクトボードに追加
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
             github.projects.createCard({
-              column_id: 14120676,
-              context_id: context.payload.issue.id,
-              context_type: "Issue"
-              })
+            column_id: 14120676,
+            content_id: context.payload.issue.id,
+            content_type: "Issue"
+            })
